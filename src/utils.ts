@@ -8,14 +8,29 @@ export const generateRandomValue = (level: number) => {
 };
 
 export const generateTargetSum = (grid: Block[], level: number) => {
-  if (grid.length === 0) return 10;
+  if (grid.length === 0) return 15;
   
-  // Pick 2-4 random blocks to form a sum
-  const numBlocks = Math.floor(Math.random() * 3) + 2;
-  const shuffled = [...grid].sort(() => 0.5 - Math.random());
-  const selection = shuffled.slice(0, Math.min(numBlocks, grid.length));
+  // Try to find a combination of blocks that sums to between 10 and 20
+  let attempts = 0;
+  while (attempts < 100) {
+    const numBlocks = Math.floor(Math.random() * 4) + 2; // Pick 2-5 blocks
+    const shuffled = [...grid].sort(() => 0.5 - Math.random());
+    const selection = shuffled.slice(0, Math.min(numBlocks, grid.length));
+    const sum = selection.reduce((acc, block) => acc + block.value, 0);
+    
+    if (sum >= 10 && sum <= 20) {
+      return sum;
+    }
+    attempts++;
+  }
   
-  return selection.reduce((acc, block) => acc + block.value, 0);
+  // If we couldn't find a perfect match in 100 tries, 
+  // just pick a random achievable sum or fallback to a random in range
+  const randomBlocks = [...grid].sort(() => 0.5 - Math.random()).slice(0, 3);
+  const fallbackSum = randomBlocks.reduce((acc, b) => acc + b.value, 0);
+  if (fallbackSum >= 5) return Math.min(Math.max(fallbackSum, 10), 20);
+
+  return Math.floor(Math.random() * 11) + 10;
 };
 
 export const createInitialGrid = (rows: number): Block[] => {
